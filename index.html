@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Blacksmith Village</title>
+</head>
+<body onload="tick()">
+    <h1>Blacksmith Village</h1>
+    <div>
+        Money: <span id="money">0</span><br>
+    </div>
+    <div>
+        <h2>Workforce</h2>
+        Idle: <span id="idle">0</span>
+            <input type="button" value="Hire" id="hire" onclick="hire(document.getElementById('hireSpinner').value)">
+            <input type="number" min="1" value="1" style="width: 4em" id="hireSpinner">
+            <input type="checkbox" id="autoHire"><label for="autoHire">Auto Hire</label>
+
+        <br>
+        Loggers: <span id="logger">0</span><br>
+        Miners: <span id="miner">0</span><br>
+    </div>
+    <div>
+        <h2>Resources</h2>
+        Wood: <span id="wood">0</span> 
+            <input type="button" value="Sell" onclick="sell('wood', document.getElementById('woodSpinner').value)">
+            <input type="number" min="1" value="1" style="width: 4em" id="woodSpinner">
+            <progress id="woodProgress" max="0" value="0"></progress>
+            <input type="checkbox" id="woodAutoSell"><label for="woodAutoSell">Auto Sell</label>
+            <br>
+        Iron: <span id="iron">0</span>
+            <input type="button" value="Sell" onclick="sell('iron', document.getElementById('ironSpinner').value)">
+            <input type="number" min="1" value="1" style="width: 4em" id="ironSpinner">
+            <progress id="ironProgress" max="0" value="0"></progress>
+            <input type="checkbox" id="ironAutoSell"><label for="ironAutoSell">Auto Sell</label>
+            <br>
+    </div>
+<script>
+var money = 0;
+var moneyEl = document.getElementById("money");
+var hireEl = document.getElementById("hire");
+var autoHireEl = document.getElementById("autoHire");
+var tickInterval = 50;
+var workerCost = 20;
+var workers = {
+    idle: {
+        name: "Idle workers",
+        quantity: 0,
+        el: document.getElementById("idle"),
+    },
+    logger: {
+        name: "Logger",
+        quantity: 1,
+        el: document.getElementById("logger"),
+    },
+    miner: {
+        name: "Miner",
+        quantity: 0,
+        el: document.getElementById("miner"),
+
+    },
+};
+var resources = {
+    wood: {
+        name: "Wood",
+        value: 1,
+        tickCost: 16,
+        tickCount: 0,
+        worker: "logger",
+        storage: 0,
+        el: document.getElementById("wood"),
+        progressEl: document.getElementById("woodProgress"),
+        autoSellEl: document.getElementById("woodAutoSell"),
+    },
+    iron: {
+        name: "Iron",
+        value: 2,
+        tickCost: 16,
+        tickCount: 0,
+        worker: "miner",
+        storage: 0,
+        el: document.getElementById("iron"),
+        progressEl: document.getElementById("ironProgress"),
+        autoSellEl: document.getElementById("ironAutoSell"),
+    },
+};
+
+
+
+function tick() {
+    for (var resourceName in resources) {
+        var resource = resources[resourceName];
+        if (resource.tickCount < 1) {
+            resource.storage += workers[resource.worker].quantity;
+            resource.tickCount = resource.tickCost;
+        } else {
+            resource.tickCount--;
+        }
+        resource.el.innerHTML = resource.storage;
+        resource.progressEl.max = resource.tickCost;
+        if (workers[resource.worker].quantity) {
+            resource.progressEl.value = resource.tickCost - resource.tickCount;
+        }
+        if (resource.autoSellEl.checked) {
+            sell(resourceName, resource.storage);
+        }
+    }
+    for (var worker in workers) {
+        worker = workers[worker];
+        worker.el.innerHTML = worker.quantity;
+    }
+    moneyEl.innerHTML = money;
+    hireEl.disabled = money < workerCost;
+    
+    if (autoHire.checked) {
+       hire(Math.floor(money / workerCost)); 
+    }      
+   
+    setTimeout(tick, tickInterval);
+}
+
+function sell(resource, quantity) {
+    if (resources[resource].storage >= quantity) {
+        money += quantity * resources[resource].value;
+        resources[resource].storage -= quantity;
+    } else {
+        money += resources[resource].storage * resources[resource].value;
+        resources[resource].storage = 0;
+    }
+}
+
+function hire(quantity) {
+    quantity = 1 * quantity;
+    var cost = quantity * workerCost;
+    if (cost <= money) {
+        money -= cost;
+        workers.idle.quantity += quantity;
+    } else {
+        quantity = Math.floor(money / workerCost);
+        workers.idle.quantity += quantity;
+        money -= quantity * workerCost;
+    }
+}
+</script>
+</body>
+</html>
