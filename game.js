@@ -39,9 +39,21 @@ workers.set("woodCutter", {
         ["wood", {produce: 1, tickCost: 32, consume: new Map}],
     ]),
     currentProduce: "wood",
-    produce: new Map([["wood", 1]]),
     tickCount: 0,
 });
+
+workers.set("miner", {
+    name: "Miner",
+    quantity: 0,
+    cost: 100,
+    baseCost: 100,
+    production: new Map([
+        ["ironOre", {produce: 1, tickCost: 50, consume: new Map}],
+    ]),
+    currentProduce: "ironOre",
+    tickCount: 0,
+});
+
 
 
 var resources = new Map;
@@ -66,6 +78,14 @@ resources.set("wood", {
     value: 5,
     quantity: 0,
 });
+
+resources.set("ironOre", {
+    name: "Iron ore",
+    cost: new Map([["money", 70]]),
+    value: 7,
+    quantity: 0,
+});
+
 
 function tick() {
     for (let [workerId, worker] of workers) {
