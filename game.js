@@ -4,93 +4,10 @@ const EL_NAME = "#GameScreen";
 
 var el = null;
 
-var workers = new Map;
-
-workers.set("forager", {
-    name: "Forager",
-    quantity: 1,
-    cost: 10,
-    baseCost: 10,
-    production: new Map([
-        ["food", {produce: 1, tickCost: 16, consume: new Map}],
-    ]),
-    currentProduce: "food",
-    tickCount: 0,
-});
-
-workers.set("farmer", {
-    name: "Farmer",
-    quantity: 0,
-    cost: 100,
-    baseCost: 100,
-    production: new Map([
-        ["food", {produce: 12, tickCost: 160, consume: new Map}],
-    ]),
-    currentProduce: "food",
-    tickCount: 0,
-});
-
-workers.set("woodCutter", {
-    name: "Wood cutter",
-    quantity: 0,
-    cost: 64,
-    baseCost: 64,
-    production: new Map([
-        ["wood", {produce: 1, tickCost: 32, consume: new Map}],
-    ]),
-    currentProduce: "wood",
-    tickCount: 0,
-});
-
-workers.set("miner", {
-    name: "Miner",
-    quantity: 0,
-    cost: 100,
-    baseCost: 100,
-    production: new Map([
-        ["ironOre", {produce: 1, tickCost: 50, consume: new Map}],
-    ]),
-    currentProduce: "ironOre",
-    tickCount: 0,
-});
-
-
-
-var resources = new Map;
-
-resources.set("money", {
-    name: "Money",
-    cost: new Map,
-    value: 1,
-    quantity: 0,
-});
-
-resources.set("food", {
-    name: "Food",
-    cost: new Map([["money", 10]]),
-    value: 5,
-    quantity: 0,
-});
-
-resources.set("wood", {
-    name: "Wood",
-    cost: new Map([["money", 50]]),
-    value: 5,
-    quantity: 0,
-});
-
-resources.set("ironOre", {
-    name: "Iron ore",
-    cost: new Map([["money", 70]]),
-    value: 7,
-    quantity: 0,
-});
-
-
-function tick() {
+function tick(tap) {
     for (let [workerId, worker] of workers) {
         worker.cost = worker.baseCost * (1 + Math.floor(worker.quantity / 10));
-        if (worker.tickCount > worker.production.get(worker.currentProduce).tickCost) {
+        if (tap || worker.tickCount > worker.production.get(worker.currentProduce).tickCost) {
             resources.get(worker.currentProduce).quantity += 
                 worker.production.get(worker.currentProduce).produce * worker.quantity;
             worker.tickCount = 0;
@@ -98,13 +15,19 @@ function tick() {
             worker.tickCount++;
         }
     }
-    updateScreen();
-    setTimeout(tick, TICK_INTERVAL);
+    if (!tap){
+        
+        updateScreen();
+        setTimeout(tick, TICK_INTERVAL);
+    }
 }
 
 function createScreen() {
     el = document.querySelector(EL_NAME);
     var html = `
+        <div>
+            <input type="button" value="Tap!" onclick="tick(true)"></input>
+        </div>
         <div>
             <h2>Workforce</h2>`;
     for (let [workerId, worker] of this.workers) {

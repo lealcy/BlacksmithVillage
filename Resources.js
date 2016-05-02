@@ -1,15 +1,29 @@
-"use strict";
+var resources = new Map;
 
-function createResourceList() {
-    var rl = new Map(
-        ["money"]
-    );
-    rl.set("money", new Resource("money", "Money"));
-    rl.set("forager", new Resource("forager", "Forager", 0, [["money", 1]], [["food", 1]]));
-    rl.set("woodCutter", new Resource("woodCutter", "Wood Cutter", 0, [["food", 1], ["money", 3]], [["wood", 1]]));
-    rl.set("food", new Resource("food", "food", 1));
-    rl.set("food", new Resource("food", "food", 1));
-    rl.set("wood", new Resource("wood", "Wood", 10));
-    rl.set("ironOre", new Resource("ironOre", "Iron Ore", 7));
-    return rl;
-}
+resources.set("money", {
+    name: "Money",
+    cost: new Map,
+    value: 1,
+    quantity: 0,
+});
+
+resources.set("food", {
+    name: "Food",
+    cost: new Map([["money", 2]]),
+    value: 1,
+    quantity: 0,
+});
+
+resources.set("wood", {
+    name: "Wood",
+    cost: new Map([["money", 3]]),
+    value: 2,
+    quantity: 0,
+});
+
+resources.set("ironOre", {
+    name: "Iron Ore",
+    cost: new Map([["money", 6]]),
+    value: 4,
+    quantity: 0,
+});
